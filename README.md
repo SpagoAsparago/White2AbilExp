@@ -11,7 +11,10 @@ If you haven't already, install [CTRMap-Community Edition](https://github.com/ki
 Go to the *vfs/data/a/0/0/2* in the folder of the project you created, and drop there files 374 and 375 from the text folder of this repo. You can open CTRMap again now.
 Next you need to download [PMC](https://github.com/kingdom-of-ds-hacking/PMC), go to the extras tab of CTRMap and click *Install/Update PMC*. You only need to do this the first time you create a new project.
 
-Then click "Convert ELF to DLL" and select the `esdb.yml` obtained from this repository, and at the next prompt on file selection screen, select `abilexp.elf`. Now you can save your project and export your ROM.
+Then click "Convert ELF to DLL" and select the `esdb.yml` obtained from this repository, and at the next prompt on file selection screen, select `abilexp.elf`and make sure the *install to /patches* checkbox is enabled. Now you can save your project and export your ROM.
+
+### Gen 6+ Weather Duration 
+If you don't like pre gen-6 endless weather from abilities, you can install the `abilweather.elft` patch in the same way listed above to have weather abilities set the weather for 5 turns, or 8 when holding the correct rock item. 
 
 ## Assigning the new abilities to the Pokémons
 At the moment there is no tool that supports expanded abilities, so you have to hex edit the personal narc. First with Tinke extract the a/0/1/6 narc. Then open a unedited BW2 ROM in PRC_BW2 (doesn't need to be the same as the one you are using), scroll to the pokemon you want to edit and copy the bytes listed in the hexadecimal view. Next open the a/0/1/6 narc you extracted with a hex editor and search those bytes you copied. The ability slots start at the 25th byte, being in order respectively first ability, second ability and hidden ability.
