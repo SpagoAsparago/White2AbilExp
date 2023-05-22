@@ -178,7 +178,7 @@ enum WeatherID
 {
   WEATHER_SUN = 1,
   WEATHER_RAIN = 2,
-  WEATHER_HEAIL = 3,
+  WEATHER_HAIL = 3,
   WEATHER_SAND = 4,
 };
 

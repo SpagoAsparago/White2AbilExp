@@ -16,7 +16,7 @@ unsigned int * THUMB_BRANCH_CommonWeatherChangeAbility (int a1, unsigned int *a2
     if ( ( (Weather == WEATHER_RAIN) && (itemId == 285) ) //Damp Rock
     || ( (Weather == WEATHER_SUN) && (itemId == 284) ) //Heat Rock
     || ( (Weather == WEATHER_SAND) && (itemId == 283) ) //Smooth Rock
-    || ( (Weather == WEATHER_HEAIL) && (itemId == 282) ) ) //Icy Rock
+    || ( (Weather == WEATHER_HAIL) && (itemId == 282) ) ) //Icy Rock
     {
       WeatherDuration = 8;
     }
