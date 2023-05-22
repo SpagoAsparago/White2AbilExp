@@ -52,6 +52,7 @@ C_DECL_BEGIN
     extern unsigned int* HandlerObliviousActionEnd(int a1, int a2, int a3);
     extern int CommonStatDropGuardCheck(int a1, int a2, int *a3, int a4);
     extern int CommonStatDropGuardFixed(int a1, int a2, int *a3, __int16 a4);
+    extern unsigned int * CommonWeatherChangeAbility(int a1, unsigned int *a2, char Weather);
 
     //color change handler
     extern int sub_21CDE78(int a1);
@@ -168,6 +169,17 @@ enum Types
   TYPE_DARK = 16,
   TYPE_FAIRY = 17,
   TYPE_NONE = 18,
+};
+
+enum WeatherID
+#ifdef __cplusplus
+: u32
+#endif
+{
+  WEATHER_SUN = 1,
+  WEATHER_RAIN = 2,
+  WEATHER_HEAIL = 3,
+  WEATHER_SAND = 4,
 };
 
 enum ItemField
