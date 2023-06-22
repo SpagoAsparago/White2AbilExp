@@ -10,11 +10,12 @@ If you haven't already, install [CTRMap-Community Edition](https://github.com/ki
 
 Go to the *vfs/data/a/0/0/2* in the folder of the project you created, and drop there files 374 and 375 from the text folder of this repo. You can open CTRMap again now.
 Next you need to download [PMC](https://github.com/kingdom-of-ds-hacking/PMC), go to the extras tab of CTRMap and click *Install/Update PMC*. You only need to do this the first time you create a new project.
+Then make sure there is a `patches` directory in the CTRMapProjectFolder/vfs/data/patches, if there isn't create one and move there the last [NitroKernel.dll release](https://github.com/HelloOO7/NitroKernel/releases).
 
-Then click "Convert ELF to DLL" and select the `esdb.yml` obtained from this repository, and at the next prompt on file selection screen, select `abilexp.elf`and make sure the *install to /patches* checkbox is enabled. Now you can save your project and export your ROM.
+Then all you have to do is move AbilExp.dll inside the patches folder, and export the ROM with CTRMap.
 
 ### Gen 6+ Weather Duration 
-If you don't like pre gen-6 endless weather from abilities, you can install the `abilweather.elft` patch in the same way listed above to have weather abilities set the weather for 5 turns, or 8 when holding the correct rock item. 
+If you don't like pre gen-6 endless weather from abilities, you can install the `abilweather.dll` patch in the same way listed above to have weather abilities set the weather for 5 turns, or 8 when holding the correct rock item. 
 
 ## Assigning the new abilities to the Pokémons
 At the moment there is no tool that supports expanded abilities, so you have to hex edit the personal narc. First with Tinke extract the a/0/1/6 narc. Then open a unedited BW2 ROM in PRC_BW2 (doesn't need to be the same as the one you are using), scroll to the pokemon you want to edit and copy the bytes listed in the hexadecimal view. Next open the a/0/1/6 narc you extracted with a hex editor and search those bytes you copied. The ability slots start at the 25th byte, being in order respectively first ability, second ability and hidden ability.
@@ -23,10 +24,11 @@ Once you found it, replace the byte in that slot with the hexadecimal number of 
 ## Compiling the code
 If you want to change some numbers in the ability effects or just mess around with the code, you will need to download the [White 2 Development Headers](https://github.com/kingdom-of-ds-hacking/swan). If you haven't already, you also need to install the [ARM GNU Toolchain](https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads). Once you've made the changes to the code files, you can compile it with g++.
 Move the .cpp and .h files to the same folder along the swan-master folder, then launch the cmd from that folder and run `arm-none-eabi-g++ -r -mthumb -march=armv5t -Os abilexp.cpp -Iswan-master -o abilexp.elf`.
-Then follow the installation instructions listed above using the .elf file you obtained.
+
+Next open CTRMap and go to the Extras tab, click "Convert ELF to DLL" and select the `esdb.yml` obtained from this repository, and at the next prompt on file selection screen, select the `abilexp.elf` file you previously compiled and make sure the *install to /patches* checkbox is enabled. Now you can save your project and export your ROM.
 
 ## Fairy Type
-Pixilate and Fairy Aura work as well if the fairy type is implemented. For the fairy type implementation check [this page](https://kingdom-of-ds-hacking.github.io/gen5/b2w2/guides/fairy/fairy.html).
+Pixilate and Fairy Aura work as well if the fairy type is implemented, otherwise they will affect only Struggle. For the fairy type implementation check [this page](https://kingdom-of-ds-hacking.github.io/gen5/b2w2/guides/fairy/fairy.html).
 If the fairy type isn't implemented, Protean will make your mon typeless when using struggle. If you don't like this, change `if ( (result) != 18 )` to `if ( (result) != 17 )` in the `HandlerProtean` function, then compile the code.
 
 ## Issues Reporting/Contribute
