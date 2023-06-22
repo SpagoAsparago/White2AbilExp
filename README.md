@@ -1,5 +1,5 @@
 # White2 Abilities Expansion
-This is a code injection repository that currently adds 18/26 Gen VI abilities to Pokemon White 2. Only works on the US version of the ROM.
+This is a code injection repository that currently adds 20/26 Gen VI abilities to Pokemon White 2. Only works on the US version of the ROM.
 
 ## [List of Abilities currently Implemented](https://docs.google.com/spreadsheets/d/1Z9BVbam3jXbOelvhXHAxihjGmpQW1BUehAXLNb5rvwo/edit#gid=1287043581)
 Those are the abilities whose basic effect currently works at the moment, known issues and missing features are listed alongside them. Extensive testing is still required, and anything related to AI behavior regarding new abilities needs to be tested as well.
