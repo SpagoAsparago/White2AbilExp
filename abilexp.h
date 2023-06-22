@@ -8,12 +8,19 @@
 typedef void* (*ABILITY_SETUP_FUNC)(int*);
 typedef void* (*ABILITY_HANDLER_FUNC)();
 
+typedef void* (*ITEM_SETUP_FUNC)(int*);
+typedef void* (*ITEM_HANDLER_FUNC)();
+
 C_DECL_BEGIN
 
     int const DEFAULT_ABIL_NUMBER = 158;
     int const NEW_ABIL_NUMBER = 27;
+    int const DEFAULT_ITEM_NUMBER = 172;
+    int const NEW_ITEM_NUMBER = 12;
+    
     extern int calcAbilHandlerSubPriority(int a1, int a2, int a3, int a4);
     extern int GetBattleMonStat(int a1, int a2);
+    extern int RawBattleMonStat(int a1, int a2);
     extern int GetMonID(int a1);
     extern int* BattleEvent_AddItem(int a1, __int16 a2, int a3, int a4, char a5, int a6, unsigned __int16 a7);
 
@@ -25,6 +32,12 @@ C_DECL_BEGIN
     extern int BattleEventVar_GetValue(int a1);
     extern int BattleEventVar_MulValue(int a1, int a2);
     extern int BattleEventVar_RewriteValue(int a1, int a2);
+    extern unsigned int BattleEventVar_SetValue(int a1, int a2);
+    extern unsigned int BattleEventVar_SetConstValue(int a1, int a2);
+    extern unsigned int BattleEventVar_SetRewriteOnceValue(int a1, int a2);
+    extern int BattleEvent_CallHandlers(int a1, int a2);
+    extern int BattleEventVar_Push();
+    extern int BattleEventVar_Pop();
     extern int BattleHandler_AddArg(int result, int a2);
     extern unsigned __int16* BattleHandler_StrSetup(unsigned __int16 *result, unsigned __int8 a2, __int16 a3);
     extern char* BattleHandler_PushWork(int a1, int a2, int a3);
@@ -33,6 +46,8 @@ C_DECL_BEGIN
    
     extern int BattleEventItem_GetSubID(int a1);
     extern int PML_MoveGetCategory(int wazaId);
+    extern int PML_MoveGetParam(int wazaId, u16 MoveField);
+    extern unsigned __int8 PML_MoveGetType(int wazaId);
     extern int PML_ItemIsBerry(u16 itemId);
     extern int sub_21BBF80(int a1); //harvest handler
     extern int CommonGetItemParam(int a1, int itemField);
@@ -44,6 +59,7 @@ C_DECL_BEGIN
     extern bool CheckCondition(int a1, int conditionID);
     extern bool IsAllyMonID(unsigned int a1, unsigned int a2);
     extern bool DoesMonHaveType(int a1, int a2);
+    extern int MakeConditionParamPermanent(int a1);
 
     extern int HandlerAddStatusFailedCommon(int a1, int a2, int a3, int *a4);
     extern int HandlerCommonGuardStatus(int a1, int a2, int a3);
@@ -67,8 +83,25 @@ C_DECL_BEGIN
 
     //healer handler
     extern int sub_21ABB90(int a1, unsigned int a2);
-    int HandlerGetAlivePartyCount(int a1, __int16 a2, int a3);
+    extern int HandlerGetAlivePartyCount(int a1, __int16 a2, int a3);
 
+    //CheckMultiHitMove
+    extern unsigned int sub_21BD3F8(unsigned int result);
+
+    //Metronome
+    extern int sub_21CC340(int a1);
+    extern int sub_21BD698(int a1, unsigned int a2);
+    extern int sub_21ABBB0(int a1, int a2, int a3);
+
+    //Item effects
+    extern int CommonResistBerry(int a1, int a2, int a3, unsigned int *a4, unsigned __int8 a5, int a6);
+    extern unsigned int* HandlerCommonResistBerryDamageAfter(int a1, int a2, int a3, unsigned int **a4);
+    extern int HandlerGemEnd(int a1, int a2, int a3, int *a4);
+    extern void CommonGemDecide(int r0_0, int a2, int a3, unsigned int *a4, unsigned __int8 a5);
+    extern int CommonGemPower(int a1, int a2, int a3, unsigned int *a4, unsigned __int8 a5);
+    extern int CommonTypeBoostingItem(int a1, int a2, int a3, int a4);
+    extern unsigned int* HandlerChoiceItemCommonItemChange(int a1, int a2, unsigned int *a3);
+    
 C_DECL_END
 
 enum BattleEventVar
@@ -147,7 +180,7 @@ enum Conditions
 
 enum Types 
 #ifdef __cplusplus
-: u32
+: u8
 #endif
 {
   TYPE_NORMAL = 0,
@@ -251,3 +284,42 @@ enum ItemField
   ITSTAT_FRIENDSHIP2 = 0x3D,
   ITSTAT_FRIENDSHIP3 = 0x3E,
 };
+
+enum MoveField
+#ifdef __cplusplus
+: u16
+#endif
+{
+ MVDATA_TYPE     = 0,
+ MVDATA_QUALITY  = 1,
+ MVDATA_CATEGORY = 2,
+ MVDATA_POWER    = 3,
+ MVDATA_ACCURACY = 4,
+ MVDATA_BASEPP   = 5,
+ MVDATA_PRIORITY = 6,
+ MVDATA_CRIT_STAGE = 7,
+ MVDATA_HIT_MAX  = 8,
+ MVDATA_HIT_MIN  = 9,
+ MVDATA_FLINCH_RATE = 0xA,
+ MVDATA_INFLICT_STATUS = 0xB,
+ MVDATA_INFLICT_CHANCE = 0xC,
+ MVDATA_INFLICT_DURATION = 0xD,
+ MVDATA_TURN_MIN = 0xE,
+ MVDATA_TURN_MAX = 0xF,
+ MVDATA_STAT1    = 0x10,
+ MVDATA_STAT2    = 0x11,
+ MVDATA_STAT3    = 0x12,
+ MVDATA_STAT1_STAGE = 0x13,
+ MVDATA_STAT2_STAGE = 0x14,
+ MVDATA_STAT3_STAGE = 0x15,
+ MVDATA_STAT1_CHANCE = 0x16,
+ MVDATA_STAT2_CHANCE = 0x17,
+ MVDATA_STAT3_CHANCE = 0x18,
+ MVDATA_RECOIL   = 0x19,
+ MVDATA_HEAL     = 0x1A,
+ MVDATA_TARGET   = 0x1B,
+ MVDATA_WAZASEQ_ID = 0x1C,
+ MVDATA_UNUSED   = 0x1D,
+ MVDATA_RECOIL_NEG = 0x1E,
+ MVDATA_HEAL_NEG = 0x1F,
+ };

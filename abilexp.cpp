@@ -3,6 +3,75 @@
 extern "C" {
 
 int GlobalItem;
+int GlobalVar;
+
+/*int THUMB_BRANCH_ServerEvent_CheckMultihitHits(int a1, int a2, int a3, unsigned __int8 *a4)
+{
+  unsigned int Param; // r4
+  int MonID; // r0
+  char Value; // r0
+  int result; // r0
+  int v11; // [sp+0h] [bp-18h]
+
+  Param = (unsigned __int8)PML_MoveGetParam(a3, MVDATA_HIT_MAX);
+  a4[1] = 0;
+  a4[5] = 3;
+  if ( (Param <= 1) && (GlobalVar == 0) )
+  {
+    *a4 = 1;
+    result = 0;
+    a4[2] = 0;
+    a4[3] = 0;
+  }
+  else if ( (Param <= 1) && (GlobalVar == 1) )
+  {
+    v11 = sub_21BD3F8(Param);
+    BattleEventVar_Push();
+    MonID = GetMonID(a2);
+    BattleEventVar_SetConstValue(VAR_ATTACKINGMON, MonID);
+    BattleEventVar_SetConstValue(VAR_FLOATING|0x8, Param);
+    BattleEventVar_SetValue(VAR_FAILCAUSE|0x8, v11);
+    BattleEventVar_SetRewriteOnceValue(VAR_GENERALUSE, 0);
+    BattleEventVar_SetRewriteOnceValue(VAR_SEMIINVULNERABLE, 0);
+    BattleEvent_CallHandlers(a1, 53);
+
+      *a4 = 2;
+      Value = 0;
+
+    a4[2] = Value;
+    a4[3] = 1;
+    BattleEventVar_Pop();
+    GlobalVar = 0;
+    return 1;
+  } 
+  else
+  {
+    v11 = sub_21BD3F8(Param);
+    BattleEventVar_Push();
+    MonID = GetMonID(a2);
+    BattleEventVar_SetConstValue(VAR_ATTACKINGMON, MonID);
+    BattleEventVar_SetConstValue(VAR_FLOATING|0x8, Param);
+    BattleEventVar_SetValue(VAR_FAILCAUSE|0x8, v11);
+    BattleEventVar_SetRewriteOnceValue(VAR_GENERALUSE, 0);
+    BattleEventVar_SetRewriteOnceValue(VAR_SEMIINVULNERABLE, 0);
+    BattleEvent_CallHandlers(a1, 53);
+    if ( Param <= 5 && BattleEventVar_GetValue(81) )
+    {
+      *a4 = Param;
+      Value = 0;
+    }
+    else
+    {
+      *a4 = BattleEventVar_GetValue(42);
+      Value = BattleEventVar_GetValue(66);
+    }
+    a4[2] = Value;
+    a4[3] = 1;
+    BattleEventVar_Pop();
+    return 1;
+  }
+  return result;
+}*/
 
 int RecoverHP(int a1, int a2, unsigned int a3){
   char *v6; // r5
@@ -117,7 +186,6 @@ int CustomCommonStatDropGuardCheck(int a1, int a2, int *a3, int a4)
         }
      }
     }
-
   }
 
   return result;
@@ -446,7 +514,7 @@ unsigned int * HandlerCompetitive(int a1, int a2, int a3)
       {
         v7 = BattleHandler_PushWork(a2, 14, a3);
         *(unsigned int *)v7 |= 0x800000u;
-        *((unsigned int *)v7 + 1) = 3;
+        *((unsigned int *)v7 + 1) = SPECIAL_ATTACK;
         v7[12] = 2;
         v7[14] = 1;
         v7[15] = 1;
@@ -534,19 +602,22 @@ int HandlerStanceChangeGuardCondition(int a1, int a2, int a3)
   return result;
 }
 
-int HandlerGaleWings(int a1, int a2, int a3)
+int HandlerGaleWings(int a1, int a2, int a3) //Does not work with moves that change their own type
 {
   int result; // r0
   unsigned __int16 Value; // r0
   unsigned __int8 v6; // r0
 
-  result = BattleEventVar_GetValue(3);
+  result = BattleEventVar_GetValue(VAR_ATTACKINGMON);
   if ( a3 == result )
   {
-    if ( BattleEventVar_GetValue(VAR_MOVETYPE) == 2 )
+    int BattleMon = GetBattleMon(a2, result);
+    Value = BattleEventVar_GetValue(VAR_MOVEID);
+    if ((PML_MoveGetType(Value) == TYPE_FLYING) && (Value != 165)
+    && (GetBattleMonStat(BattleMon, 13) == GetBattleMonStat(BattleMon, 14)))
     {
-      v6 = BattleEventVar_GetValue(24);
-      return BattleEventVar_RewriteValue(24, v6 + 1);
+      v6 = BattleEventVar_GetValue((BattleEventVar)24);
+      return BattleEventVar_RewriteValue((BattleEventVar)24, v6 + 1);
     }
   }
   return result;
@@ -564,9 +635,9 @@ int HandlerMegaLauncher(int a1, int a2, int a3)
     {
       return BattleEventVar_MulValue(VAR_MOVEPOWERRATIO, 6144);
     }
-    else if (result == 505 )
+    else if (result == 505 ) //Does it do anything?
     {
-      return BattleEventVar_MulValue(VAR_MOVEPOWERRATIO, 6144);
+      return BattleEventVar_MulValue(VAR_MOVEPOWERRATIO, 7168);
     }
   }
   return result;
@@ -579,7 +650,7 @@ int HandlerGrassPelt(int a1, int a2, int a3)
   if ( a3 == result ) {
     if (sub_21D5AB4(0xFF)) //Change to Grassy Terrain FieldEvent ID
     {
-      BattleEventVar_GetValue(VAR_MOVEID);
+      //BattleEventVar_GetValue(VAR_MOVEID);
       if (BattleEventVar_GetValue(VAR_MOVECATEGORY) == 1)
       { 
         return BattleEventVar_MulValue(VAR_RATIO, 6144);
@@ -676,7 +747,7 @@ int HandlerToughClaws(int a1, int a2, int a3)
   return result;
 }
 
-int  HandlerPixilate(int a1, int a2, int a3)
+int HandlerPixilate(int a1, int a2, int a3)
 {
   int result; // r0
   result = BattleEventVar_GetValue(VAR_MONID);
@@ -732,7 +803,7 @@ unsigned int* HandlerGooey(int a1, int a2, int a3)
   return (unsigned int*)result;
 }
 
-int  HandlerAerilate(int a1, int a2, int a3)
+int HandlerAerilate(int a1, int a2, int a3)
 {
   int result; // r0
   result = BattleEventVar_GetValue(VAR_MONID);
@@ -758,13 +829,23 @@ int HandlerAerilateBoost(int a1, int a2, int a3)
   return result;
 }
 
-int HandlerParentalBond(int a1, int a2, int a3)
+int HandlerParentalBond(int a1, int a2, int a3, int a4)
 {
   int result; // r0
-  result = BattleEventVar_GetValue(VAR_ATTACKINGMON);
-  if ( a3 == result ) 
+  int v7; // r0
+  int v8; // r4
+  int v9; // r5
+  int v10[6]; // [sp+0h] [bp-18h] BYREF
+
+  v10[1] = a4;
+  result = BattleEventVar_GetValue(2);
+  if ( a3 == result )
   {
-    return result;
+    v7 = sub_21CC340((int)v10);
+    v8 = sub_21BD698(v7, (v10[0]));
+    v9 = sub_21ABBB0(a2, a3, v8);
+    BattleEventVar_RewriteValue(VAR_MOVEID, v8);
+    return BattleEventVar_RewriteValue((BattleEventVar)13, v9);
   }
   return result;
 }
@@ -789,15 +870,32 @@ int HandlerFairyAura(int a1, int a2, int a3)
   return result;
 }
 
-int HandlerAuraBreak(int a1, int a2, int a3)
+int HandlerAuraBreakDark(int a1, int a2, int a3)
 {
   int result; // r0
   result = BattleEventVar_GetValue(VAR_MONID);
   if ( a3 == result ) {
-    return result;
+    if ( BattleEventVar_GetValue(VAR_MOVETYPE) == TYPE_DARK ) 
+    {
+      return BattleEventVar_MulValue(VAR_MOVEPOWERRATIO, 3072);
+    }
   }
   return result;
 }
+
+int HandlerAuraBreakFairy(int a1, int a2, int a3)
+{
+  int result; // r0
+  result = BattleEventVar_GetValue(VAR_MONID);
+  if ( a3 == result ) {
+    if ( BattleEventVar_GetValue(VAR_MOVETYPE) == TYPE_FAIRY ) 
+    {
+      return BattleEventVar_MulValue(VAR_MOVEPOWERRATIO, 3072);
+    }
+  }
+  return result;
+}
+
 
 int HandlerPrimordialSea(int a1, int a2, int a3)
 {
@@ -826,6 +924,7 @@ int HandlerDeltaStream(int a1, int a2, int a3)
   }
   return result;
 }
+
 #pragma endregion Handlers
 
 typedef struct {
@@ -891,203 +990,204 @@ ABILITY_TRIGGERTABLE AbilityTriggerTable[] =
 { 40,		(ABILITY_HANDLER_FUNC) HandlerAerilate},
 { 59,		(ABILITY_HANDLER_FUNC) HandlerAerilateBoost},
 
-{ 0x35,		(ABILITY_HANDLER_FUNC) HandlerParentalBond},
+{ 0x18,		(ABILITY_HANDLER_FUNC) HandlerParentalBond},
 
 { 0x38,		(ABILITY_HANDLER_FUNC) HandlerDarkAura},
 { 0x38,		(ABILITY_HANDLER_FUNC) HandlerFairyAura},
 
-{ 0x38,		(ABILITY_HANDLER_FUNC) HandlerAuraBreak},
+{ 0x38,		(ABILITY_HANDLER_FUNC) HandlerAuraBreakDark},
+{ 0x38,		(ABILITY_HANDLER_FUNC) HandlerAuraBreakFairy},
 
-{ 75,		(ABILITY_HANDLER_FUNC) HandlerDesolateLand},
-{ 75,		(ABILITY_HANDLER_FUNC) HandlerPrimordialSea},
-{ 75,		(ABILITY_HANDLER_FUNC) HandlerDeltaStream},
+{ 0x0,		(ABILITY_HANDLER_FUNC) HandlerDesolateLand},
+{ 0x0,		(ABILITY_HANDLER_FUNC) HandlerPrimordialSea},
+{ 0x0,		(ABILITY_HANDLER_FUNC) HandlerDeltaStream},
 
 };
 
 #pragma region EventAddAbility
-int * EventAddAromaVeil(unsigned __int16 *a1)
+int * EventAddAromaVeil(unsigned int *a1)
 {
   *a1 = 5;
   return (int*)&AbilityTriggerTable[0].triggerValue;
 }
 
-int * EventAddFlowerVeil(unsigned __int16 *a1)
+int * EventAddFlowerVeil(unsigned int *a1)
 {
   *a1 = 4;
   return (int*)&AbilityTriggerTable[5].triggerValue;
 }
 
-int * EventAddCheekPouch(unsigned __int16 *a1)
+int * EventAddCheekPouch(unsigned int *a1)
 {
   *a1 = 2;
   return (int*)&AbilityTriggerTable[9].triggerValue;
 }
 
-int * EventAddProtean(unsigned __int16 *a1)
+int * EventAddProtean(unsigned int *a1)
 {
   *a1 = 1;
   
   return (int*)&AbilityTriggerTable[11].triggerValue;
 }
 
-int * EventAddFurCoat(unsigned __int16 *a1)
+int * EventAddFurCoat(unsigned int *a1)
 {
   *a1 = 1;
   
   return (int*)&AbilityTriggerTable[12].triggerValue;
 }
 
-int * EventAddMagician(unsigned __int16 *a1)
+int * EventAddMagician(unsigned int *a1)
 {
   *a1 = 2;
   
   return (int*)&AbilityTriggerTable[13].triggerValue;
 }
 
-int * EventAddBulletproof(unsigned __int16 *a1)
+int * EventAddBulletproof(unsigned int *a1)
 {
   *a1 = 1;
   
   return (int*)&AbilityTriggerTable[15].triggerValue;
 }
 
-int * EventAddCompetitive(unsigned __int16 *a1)
+int * EventAddCompetitive(unsigned int *a1)
 {
   *a1 = 1;
   
   return (int*)&AbilityTriggerTable[16].triggerValue;
 }
 
-int * EventAddStrongJaw(unsigned __int16 *a1)
+int * EventAddStrongJaw(unsigned int *a1)
 {
   *a1 = 1;
   
   return (int*)&AbilityTriggerTable[17].triggerValue;
 }
 
-int * EventAddRefrigerate(unsigned __int16 *a1)
+int * EventAddRefrigerate(unsigned int *a1)
 {
   *a1 = 2;
   
   return (int*)&AbilityTriggerTable[18].triggerValue;
 }
 
-int * EventAddSweetVeil(unsigned __int16 *a1)
+int * EventAddSweetVeil(unsigned int *a1)
 {
   *a1 = 2;
   
   return (int*)&AbilityTriggerTable[20].triggerValue;
 }
 
-int * EventAddStanceChange(unsigned __int16 *a1)
+int * EventAddStanceChange(unsigned int *a1)
 {
   *a1 = 3;
   
   return (int*)&AbilityTriggerTable[22].triggerValue;
 }
 
-int * EventAddGaleWings(unsigned __int16 *a1)
+int * EventAddGaleWings(unsigned int *a1)
 {
   *a1 = 1;
   
   return (int*)&AbilityTriggerTable[25].triggerValue;
 }
 
-int * EventAddMegaLauncher(unsigned __int16 *a1)
+int * EventAddMegaLauncher(unsigned int *a1)
 {
   *a1 = 1;
   
   return (int*)&AbilityTriggerTable[26].triggerValue;
 }
 
-int * EventAddGrassPelt(unsigned __int16 *a1)
+int * EventAddGrassPelt(unsigned int *a1)
 {
   *a1 = 1;
   
   return (int*)&AbilityTriggerTable[27].triggerValue;
 }
 
-int * EventAddSymbiosis(unsigned __int16 *a1)
+int * EventAddSymbiosis(unsigned int *a1)
 {
   *a1 = 2;
   
   return (int*)&AbilityTriggerTable[28].triggerValue;
 }
 
-int * EventAddToughClaws(unsigned __int16 *a1)
+int * EventAddToughClaws(unsigned int *a1)
 {
   *a1 = 1;
   
   return (int*)&AbilityTriggerTable[30].triggerValue;
 }
 
-int * EventAddPixilate(unsigned __int16 *a1)
+int * EventAddPixilate(unsigned int *a1)
 {
   *a1 = 2;
   
   return (int*)&AbilityTriggerTable[31].triggerValue;
 }
 
-int * EventAddGooey(unsigned __int16 *a1)
+int * EventAddGooey(unsigned int *a1)
 {
   *a1 = 1;
  
   return (int*)&AbilityTriggerTable[33].triggerValue;
 }
-int * EventAddAerilate(unsigned __int16 *a1)
+int * EventAddAerilate(unsigned int *a1)
 {
   *a1 = 2;
   
   return (int*)&AbilityTriggerTable[34].triggerValue;
 }
 
-int * EventAddParentalBond(unsigned __int16 *a1)
+int * EventAddParentalBond(unsigned int *a1)
 {
   *a1 = 1;
  
   return (int*)&AbilityTriggerTable[36].triggerValue;
 }
 
-int * EventAddDarkAura(unsigned __int16 *a1)
+int * EventAddDarkAura(unsigned int *a1)
 {
   *a1 = 1;
   
   return (int*)&AbilityTriggerTable[37].triggerValue;
 }
 
-int * EventAddFairyAura(unsigned __int16 *a1)
+int * EventAddFairyAura(unsigned int *a1)
 {
   *a1 = 1;
   
   return (int*)&AbilityTriggerTable[38].triggerValue;
 }
 
-int * EventAddAuraBreak(unsigned __int16 *a1)
+int * EventAddAuraBreak(unsigned int *a1)
 {
-  *a1 = 1;
+  *a1 = 2;
   
   return (int*)&AbilityTriggerTable[39].triggerValue;
 }
 
-int * EventAddPrimordialSea(unsigned __int16 *a1)
+int * EventAddPrimordialSea(unsigned int *a1)
 {
   *a1 = 1;
   
-  return (int*)&AbilityTriggerTable[40].triggerValue;
+  return (int*)&AbilityTriggerTable[41].triggerValue;
 }
 
-int * EventAddDesolateLand(unsigned __int16 *a1)
+int * EventAddDesolateLand(unsigned int *a1)
 {
   *a1 = 1;
   
-  return (int*)&AbilityTriggerTable[40].triggerValue;
+  return (int*)&AbilityTriggerTable[42].triggerValue;
 }
 
-int * EventAddDeltaStream(unsigned __int16 *a1)
+int * EventAddDeltaStream(unsigned int *a1)
 {
   *a1 = 1;
   
-  return (int*)&AbilityTriggerTable[40].triggerValue;
+  return (int*)&AbilityTriggerTable[43].triggerValue;
 }
 #pragma endregion EventAddAbility
 
@@ -1485,8 +1585,8 @@ int * THUMB_BRANCH_AbilityEvent_AddItem(int a1)
   #pragma endregion NewAbilities
   
   //Filler? Present in the original table
-  AbilArray[372] = 0x04030201;
-  AbilArray[373] = 0x00000005;
+  AbilArray[370] = 0x04030201;
+  AbilArray[371] = 0x00000005;
   
   BattleMonStat = (unsigned __int16)GetBattleMonStat(a1, 16);
   //BattleMonStat = 183; For testing purposes, give everyone this ability effect
