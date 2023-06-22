@@ -10,7 +10,7 @@ If you haven't already, install [CTRMap-Community Edition](https://github.com/ki
 
 Go to the *vfs/data/a/0/0/2* in the folder of the project you created, and drop there files 374 and 375 from the text folder of this repo. You can open CTRMap again now.
 Next you need to download [PMC](https://github.com/kingdom-of-ds-hacking/PMC), go to the extras tab of CTRMap and click *Install/Update PMC*. You only need to do this the first time you create a new project.
-Then make sure there is a `patches` directory in the CTRMapProjectFolder/vfs/data/patches, if there isn't create one and move there the last [NitroKernel.dll release](https://github.com/HelloOO7/NitroKernel/releases).
+Then make sure there is a `patches` directory at *vfs/data/patches*, if there isn't create one and move there the latest [NitroKernel.dll file](https://github.com/HelloOO7/NitroKernel/releases).
 
 Then all you have to do is move AbilExp.dll inside the patches folder, and export the ROM with CTRMap.
 
